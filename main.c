@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+
 #include "stack.h"
 #include "registers.h"
-#include "memory.h"
+#include "fetch.h"
 
 int main() {
-    /** 4kb memory. */
+    /** 4 KB memory. */
     byte memory[MEMORY_SIZE];
 
     /** The stack of memory addresses. */
@@ -21,10 +22,12 @@ int main() {
     /** 16 variable registers, V0-VF. */
     byte registers[REGISTER_SIZE];
 
-
     while (true) {
-        // FETCH the instruction from memory at the current program counter
+        // FETCHES the instruction
+        instruction newInstruction = fetch(&PC, memory);
+
         // DECODE the instruction to find out what to do
+
         // EXECUTE the instruction
 
         // run this loop about 700 times per second

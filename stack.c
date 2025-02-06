@@ -6,7 +6,6 @@
  */
 
 #include "stack.h"
-#include "memory.h"
 
 /**
  * Pops an address from the stack.

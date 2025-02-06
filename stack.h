@@ -1,3 +1,5 @@
+#include "memory.h"
+
 /** Number of addresses the stack can hold. */
 #define STACK_SIZE 16
 
