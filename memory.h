@@ -7,6 +7,8 @@
 /** Exit code for a memory underflow. */
 #define BUFFER_UNDERFLOW 103
 
+#define FONT_INDEX 0x050
+
 /** One byte of memory. */
 typedef unsigned char byte;
 

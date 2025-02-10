@@ -15,7 +15,7 @@
  * @param stack The stack to pop from.
  * @return The address that was popped.
  */
-short pop(short stack[STACK_SIZE  + 1]);
+address pop(address stack[STACK_SIZE  + 1]);
 
 /**
  * Pushes an address to the stack.
@@ -23,4 +23,4 @@ short pop(short stack[STACK_SIZE  + 1]);
  * @param stack The stack to push to.
  * @param address The address to push.
  */
-void push(short address, short stack[STACK_SIZE + 1]);
+void push(address newAddress, address stack[STACK_SIZE + 1]);

@@ -1,36 +1,88 @@
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_main.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <windows.h>
 
 #include "stack.h"
 #include "registers.h"
 #include "fetch.h"
+#include "decode.h"
 
-int main() {
+int main(int argc, char *argv[]) {
     /** 4 KB memory. */
-    byte memory[MEMORY_SIZE];
+    byte memory[MEMORY_SIZE] = {
+        [FONT_INDEX] = 0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
+        0x20, 0x60, 0x20, 0x20, 0x70, // 1
+        0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
+        0xF0, 0x10, 0xF0, 0x10, 0xF0, // 3
+        0x90, 0x90, 0xF0, 0x10, 0x10, // 4
+        0xF0, 0x80, 0xF0, 0x10, 0xF0, // 5
+        0xF0, 0x80, 0xF0, 0x90, 0xF0, // 6
+        0xF0, 0x10, 0x20, 0x40, 0x40, // 7
+        0xF0, 0x90, 0xF0, 0x90, 0xF0, // 8
+        0xF0, 0x90, 0xF0, 0x10, 0xF0, // 9
+        0xF0, 0x90, 0xF0, 0x90, 0x90, // A
+        0xE0, 0x90, 0xE0, 0x90, 0xE0, // B
+        0xF0, 0x80, 0x80, 0x80, 0xF0, // C
+        0xE0, 0x90, 0x90, 0x90, 0xE0, // D
+        0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
+        0xF0, 0x80, 0xF0, 0x80, 0x80  // F
+    };
 
     /** The stack of memory addresses. */
     address stack[STACK_SIZE + 1] = {[STACK_SIZE] = 0};
 
     /** The program counter; points to the current instruction in memory. */
-    address PC;
+    address PC = 0x200;
     
     /** The index register; points to locations in memory. */
-    address I;
+    address I = 0x0;
 
     /** 16 variable registers, V0-VF. */
-    byte registers[REGISTER_SIZE];
+    byte registers[REGISTER_SIZE] = {0};
 
-    while (true) {
-        // FETCHES the instruction
-        instruction newInstruction = fetch(&PC, memory);
+    static SDL_Window *window = NULL;
+    static SDL_Renderer *renderer = NULL;
 
-        // DECODE the instruction to find out what to do
+    SDL_Init(SDL_INIT_VIDEO);
+    SDL_CreateWindowAndRenderer("CHIP-8", SCREEN_WIDTH * PIXEL_RESIZE, SCREEN_HEIGHT * PIXEL_RESIZE, 0, &window, &renderer);
+    int run = true;
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
 
-        // EXECUTE the instruction
+    bool pixels[SCREEN_HEIGHT][SCREEN_WIDTH] = {0};
 
-        // run this loop about 700 times per second
-        // this means the program must be manually slowed down
+    FILE *rom = fopen("C:/Users/agras/CSProjects/CHIP-8/rom.ch8", "rb");
+
+    byte romByte;
+    int idx = 0x200;
+    size_t result;
+
+    SDL_Event event;
+
+    while ((result = fread(&romByte, 1, 1, rom)) == 1) {
+        memory[idx] = romByte;
+        idx++;
     }
+    while (run) {
+        instruction newInstruction = fetch(&PC, memory);
+        
+
+        decode(newInstruction, registers, &PC, &I, memory, renderer, pixels);
+
+
+        Sleep(2);
+
+        if (SDL_PollEvent(&event)) {
+            if (event.type == SDL_EVENT_KEY_DOWN ||
+                event.type == SDL_EVENT_QUIT) {
+                run = false;
+            }
+        }
+    }
+
+    SDL_Quit();
+
+    return 0;
 }
