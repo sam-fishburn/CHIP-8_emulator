@@ -8,11 +8,16 @@
 #include "fetch.h"
 
 instruction fetch(address *PC, byte memory[MEMORY_SIZE]) {
+    if (*PC >= MEMORY_SIZE - 1) {
+        // Handle error: PC out of bounds
+        exit(1); // Return an invalid instruction or handle appropriately
+    }
+
     byte firstByte = memory[*PC];
     ++*PC;
 
     byte secondByte = memory[*PC];
     ++*PC;
 
-    return firstByte * 0x100 + secondByte;
+    return (instruction)(firstByte << 8) | secondByte;
 }

@@ -43,13 +43,11 @@ int main(int argc, char *argv[]) {
     /** 16 variable registers, V0-VF. */
     byte registers[REGISTER_SIZE] = {0};
 
-    static SDL_Window *window = NULL;
-    static SDL_Renderer *renderer = NULL;
-
     SDL_Init(SDL_INIT_VIDEO);
+    SDL_Window *window = NULL;
+    SDL_Renderer *renderer = NULL;
     SDL_CreateWindowAndRenderer("CHIP-8", SCREEN_WIDTH * PIXEL_RESIZE, SCREEN_HEIGHT * PIXEL_RESIZE, 0, &window, &renderer);
-    int run = true;
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+    bool run = true;
 
     bool pixels[SCREEN_HEIGHT][SCREEN_WIDTH] = {0};
 
@@ -57,31 +55,25 @@ int main(int argc, char *argv[]) {
 
     byte romByte;
     int idx = 0x200;
-    size_t result;
 
-    SDL_Event event;
-
-    while ((result = fread(&romByte, 1, 1, rom)) == 1) {
+    while (fread(&romByte, 1, 1, rom) == 1) {
         memory[idx] = romByte;
         idx++;
     }
+    fclose(rom);
+
+    printf("test\n");
     while (run) {
         instruction newInstruction = fetch(&PC, memory);
-        
-
         decode(newInstruction, registers, &PC, &I, memory, renderer, pixels);
 
-
-        Sleep(2);
-
-        if (SDL_PollEvent(&event)) {
-            if (event.type == SDL_EVENT_KEY_DOWN ||
-                event.type == SDL_EVENT_QUIT) {
+        SDL_Event event;
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_EVENT_KEY_DOWN || event.type == SDL_EVENT_QUIT) {
                 run = false;
             }
         }
     }
-
     SDL_Quit();
 
     return 0;

@@ -3,6 +3,8 @@
         "*.c": "c",
         "sdl.h": "c",
         "sdl_main.h": "c",
-        "system_error": "c"
+        "system_error": "c",
+        "xiosbase": "c",
+        "stdio.h": "c"
     }
 }

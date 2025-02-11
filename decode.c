@@ -6,6 +6,7 @@ void decode(instruction toDecode, byte registers[REGISTER_SIZE], address *PC, ad
     switch (toDecode / FIRST_DIGIT_DIVISOR) {
     case 0x0:
         if (toDecode == 0x00E0) {
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
             SDL_RenderClear(renderer);
             SDL_RenderPresent(renderer);
         }
@@ -62,33 +63,35 @@ void decode(instruction toDecode, byte registers[REGISTER_SIZE], address *PC, ad
 
         for (int i = 0; i < N; i++) {
             byte data = memory[*I + i];
+            char currentX = xCoord;
 
-            for (int i = 7; i >= 0; i--) {
-                char pixel = data / 0b10^i;
-                data %= 0b10^i;
+            for (int j = 7; j >= 0; j--) {
+                char pixel = (data >> j) & 1;
+    
                 if (pixel != 0) {
-                    if (pixels[yCoord][xCoord]) {
+                    if (pixels[yCoord][currentX]) {
                         SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-                        pixels[yCoord][xCoord] = false;
+                        pixels[yCoord][currentX] = false;
                         registers[VF] = 1;
                     } else {
                         SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
-                        pixels[yCoord][xCoord] = true;
+                        pixels[yCoord][currentX] = true;
                     }
-                    SDL_FRect rect = {xCoord * PIXEL_RESIZE, yCoord * PIXEL_RESIZE, PIXEL_RESIZE, PIXEL_RESIZE};
+                    SDL_FRect rect = {currentX * PIXEL_RESIZE, yCoord * PIXEL_RESIZE, PIXEL_RESIZE, PIXEL_RESIZE};
                     SDL_RenderFillRect(renderer, &rect);
                 }
 
-                xCoord++;
-                if (xCoord > SCREEN_WIDTH) {
+                currentX++;
+                if (currentX >= SCREEN_WIDTH) {
                     break;
                 }
             }
 
             yCoord++;
-            if (yCoord > SCREEN_HEIGHT) {
+            if (yCoord >= SCREEN_HEIGHT) {
                 break;
             }
+
         }
 
         SDL_RenderPresent(renderer);

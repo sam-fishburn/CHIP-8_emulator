@@ -1,0 +1,7 @@
+C:/Users/agras/CSProjects/CHIP-8/build/CMakeFiles/main.dir
+C:/Users/agras/CSProjects/CHIP-8/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/agras/CSProjects/CHIP-8/build/CMakeFiles/ZERO_CHECK.dir
+C:/Users/agras/CSProjects/CHIP-8/build/vendored/SDL/CMakeFiles/SDL3-shared.dir
+C:/Users/agras/CSProjects/CHIP-8/build/vendored/SDL/CMakeFiles/SDL3_test.dir
+C:/Users/agras/CSProjects/CHIP-8/build/vendored/SDL/CMakeFiles/SDL_uclibc.dir
+C:/Users/agras/CSProjects/CHIP-8/build/vendored/SDL/CMakeFiles/ALL_BUILD.dir
