@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <windows.h>
 
 #include "stack.h"
 #include "registers.h"
@@ -51,7 +50,7 @@ int main(int argc, char *argv[]) {
 
     bool pixels[SCREEN_HEIGHT][SCREEN_WIDTH] = {0};
 
-    FILE *rom = fopen("C:/Users/agras/CSProjects/CHIP-8/rom.ch8", "rb");
+    FILE *rom = fopen("rom.ch8", "rb");
 
     byte romByte;
     int idx = 0x200;
@@ -62,17 +61,17 @@ int main(int argc, char *argv[]) {
     }
     fclose(rom);
 
-    printf("test\n");
     while (run) {
         instruction newInstruction = fetch(&PC, memory);
-        decode(newInstruction, registers, &PC, &I, memory, renderer, pixels);
+        decode(newInstruction, registers, &PC, &I, stack, memory, renderer, pixels);
 
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_EVENT_KEY_DOWN || event.type == SDL_EVENT_QUIT) {
+            if (event.type == SDL_EVENT_QUIT) {
                 run = false;
             }
         }
+        SDL_Delay(2);
     }
     SDL_Quit();
 

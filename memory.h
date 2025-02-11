@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <stdlib.h>
+
 /** Four kilobytes of memory. */
 #define MEMORY_SIZE 4096
 
