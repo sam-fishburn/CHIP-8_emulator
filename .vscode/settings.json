@@ -5,6 +5,7 @@
         "sdl_main.h": "c",
         "system_error": "c",
         "xiosbase": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "decode.h": "c"
     }
 }

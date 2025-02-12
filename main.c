@@ -60,6 +60,12 @@ int main(int argc, char *argv[]) {
     byte romByte;
     int idx = 0x200;
 
+    byte delayTimer = 0;
+    byte soundTimer = 0;
+    tick prevTicks = 0;
+    tick curTicks;
+    int hz;
+
     while (fread(&romByte, 1, 1, rom) == 1) {
         memory[idx] = romByte;
         idx++;
@@ -68,13 +74,24 @@ int main(int argc, char *argv[]) {
 
     while (run) {
         instruction newInstruction = fetch(&PC, memory);
-        decode(newInstruction, registers, &PC, &I, stack, memory, renderer, pixels, keys);
+        decode(&curTicks, &prevTicks, &delayTimer, &soundTimer, newInstruction, registers, &PC, &I, stack, memory, renderer, pixels, keys);
 
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_EVENT_QUIT) {
                 run = false;
             }
+        }
+        curTicks = SDL_GetTicks();
+        hz = (curTicks - prevTicks) / 16;
+        if (hz > 0) {
+            if (delayTimer > 0) {
+                delayTimer--;
+            }
+            if (soundTimer > 0) {
+                soundTimer--;
+            }
+            prevTicks = curTicks;
         }
     }
     SDL_Quit();

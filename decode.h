@@ -12,4 +12,6 @@
 #define SCREEN_WIDTH 64
 #define SCREEN_HEIGHT 32
 
-void decode(instruction toDecode, byte registers[REGISTER_SIZE], address *PC, address *I, address stack[STACK_SIZE + 1], byte memory[MEMORY_SIZE], SDL_Renderer *renderer, bool pixels[SCREEN_HEIGHT][SCREEN_WIDTH], byte keys[0x10]);
+typedef unsigned int tick;
+
+void decode(tick *curTicks, tick *prevTicks, byte *delayTimer, byte *soundTimer, instruction toDecode, byte registers[REGISTER_SIZE], address *PC, address *I, address stack[STACK_SIZE + 1], byte memory[MEMORY_SIZE], SDL_Renderer *renderer, bool pixels[SCREEN_HEIGHT][SCREEN_WIDTH], byte keys[0x10]);

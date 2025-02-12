@@ -1,6 +1,6 @@
 #include "decode.h"
 
-void decode(instruction toDecode, byte registers[REGISTER_SIZE], address *PC, address *I, address stack[STACK_SIZE + 1], byte memory[MEMORY_SIZE], SDL_Renderer *renderer, bool pixels[SCREEN_HEIGHT][SCREEN_WIDTH], byte keys[0x10]) {
+void decode(tick *curTicks, tick *prevTicks, byte *delayTimer, byte *soundTimer, instruction toDecode, byte registers[REGISTER_SIZE], address *PC, address *I, address stack[STACK_SIZE + 1], byte memory[MEMORY_SIZE], SDL_Renderer *renderer, bool pixels[SCREEN_HEIGHT][SCREEN_WIDTH], byte keys[0x10]) {
     byte N;
     byte NN;
     byte NNN;
@@ -14,6 +14,10 @@ void decode(instruction toDecode, byte registers[REGISTER_SIZE], address *PC, ad
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
             SDL_RenderClear(renderer);
             SDL_RenderPresent(renderer);
+            for (int i = 0; i < SCREEN_HEIGHT; i++) {
+                memset(pixels[i], 0, SCREEN_WIDTH);
+            }
+
             break;
         case 0xEE:
             *PC = pop(stack);
@@ -66,7 +70,9 @@ void decode(instruction toDecode, byte registers[REGISTER_SIZE], address *PC, ad
         break;
 
     case 0x7:
-        registers[(toDecode / SECOND_DIGIT_DIVISOR) % 0x10] += toDecode % SECOND_DIGIT_DIVISOR;
+        X = (toDecode / SECOND_DIGIT_DIVISOR) % 0x10;
+        NN = toDecode % SECOND_DIGIT_DIVISOR;
+        registers[X] += NN;
         break;
 
     case 0x8:
@@ -220,19 +226,30 @@ void decode(instruction toDecode, byte registers[REGISTER_SIZE], address *PC, ad
 
         switch (toDecode % SECOND_DIGIT_DIVISOR) {
         case 0x07:
-            printf("0x07");
+            registers[X] = *delayTimer;
             break;
         case 0x15:
-            printf("0x15");
+            *delayTimer = registers[X];
             break;
         case 0x18:
-            printf("0x18");
+            *soundTimer = registers[X];
             break;
         case 0x0A:
             SDL_Event event;
-            while (event.type != SDL_EVENT_KEY_DOWN) {
+            do {
                 SDL_WaitEvent(&event);
-            }
+                *curTicks = SDL_GetTicks();
+                int hz = (*curTicks - *prevTicks) / 16;
+                if (hz > 0) {
+                    if (delayTimer > 0) {
+                        delayTimer--;
+                    }
+                    if (soundTimer > 0) {
+                        soundTimer--;
+                    }
+                    *prevTicks = *curTicks;
+                }
+            } while (event.type != SDL_EVENT_KEY_DOWN);
 
             for (int i = 0x0; i < 0x10; i++) {
                 if (keys[i] == event.key.scancode) {
