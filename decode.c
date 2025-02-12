@@ -1,6 +1,6 @@
 #include "decode.h"
 
-void decode(instruction toDecode, byte registers[REGISTER_SIZE], address *PC, address *I, address stack[STACK_SIZE + 1], byte memory[MEMORY_SIZE], SDL_Renderer *renderer, bool pixels[SCREEN_HEIGHT][SCREEN_WIDTH]) {
+void decode(instruction toDecode, byte registers[REGISTER_SIZE], address *PC, address *I, address stack[STACK_SIZE + 1], byte memory[MEMORY_SIZE], SDL_Renderer *renderer, bool pixels[SCREEN_HEIGHT][SCREEN_WIDTH], byte keys[0x10]) {
     byte N;
     byte NN;
     byte NNN;
@@ -199,19 +199,64 @@ void decode(instruction toDecode, byte registers[REGISTER_SIZE], address *PC, ad
         break;
 
     case 0xE:
-        printf("%x\n", toDecode);
-        break;
+        const bool *keyboard = SDL_GetKeyboardState(NULL);
+        X = (toDecode / SECOND_DIGIT_DIVISOR) % 0x10;
+        switch (toDecode % SECOND_DIGIT_DIVISOR) {
+        case 0x9E:
+            if (keyboard[keys[registers[X]]]) {
+                *PC += 2;
+            }
+            break;
+        case 0xA1:
+            if (!keyboard[keys[registers[X]]]) {
+                *PC += 2;
+            }
+            break;
+        }
 
+        break;
     case 0xF:
         X = (toDecode / SECOND_DIGIT_DIVISOR) % 0x10;
-        printf("%x\n", toDecode % SECOND_DIGIT_DIVISOR);
 
         switch (toDecode % SECOND_DIGIT_DIVISOR) {
+        case 0x07:
+            printf("0x07");
+            break;
+        case 0x15:
+            printf("0x15");
+            break;
+        case 0x18:
+            printf("0x18");
+            break;
+        case 0x0A:
+            SDL_Event event;
+            while (event.type != SDL_EVENT_KEY_DOWN) {
+                SDL_WaitEvent(&event);
+            }
+
+            for (int i = 0x0; i < 0x10; i++) {
+                if (keys[i] == event.key.scancode) {
+                    registers[X] = i;
+                }
+            }
+
+            break;
         case 0x1E:
             if (*I + registers[X] > 0x0FFF || *I + registers[X] < *I) {
                 registers[VF] = 0x1;
             }
             *I += registers[X];
+            break;
+        case 0x29:
+            *I = FONT_INDEX + 5 * (registers[X] % 0x10);
+            break;
+        case 0x33:
+            placeholder = registers[X];
+
+            for (int i = 2; i >= 0; i--) {
+                memory[*I + i] = placeholder % 10;
+                placeholder /= 10;
+            }
             break;
         case 0x55:
             for (int i = 0; i <= X; i++) {
