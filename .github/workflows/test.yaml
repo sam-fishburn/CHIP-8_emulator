@@ -1,0 +1,12 @@
+name: Test new trigger
+
+on: workflow_dispatch
+
+jobs:
+  test:
+    name: "Test trigger"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Echo to check
+        run: |
+          echo "It worked"
