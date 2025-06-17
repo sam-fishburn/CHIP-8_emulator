@@ -1,0 +1,10 @@
+name: Test new trigger
+
+jobs:
+  test:
+    name: "Test trigger"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Echo to check
+        run: |
+          echo "Other branch worked"
