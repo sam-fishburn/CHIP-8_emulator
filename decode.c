@@ -3,7 +3,7 @@
 void decode(tick *curTicks, tick *prevTicks, byte *delayTimer, byte *soundTimer, instruction toDecode, byte registers[REGISTER_SIZE], address *PC, address *I, address stack[STACK_SIZE + 1], byte memory[MEMORY_SIZE], SDL_Renderer *renderer, bool pixels[SCREEN_HEIGHT][SCREEN_WIDTH], byte keys[0x10]) {
     byte N;
     byte NN;
-    byte NNN;
+    unsigned short NNN;
     byte X;
     byte Y;
     byte placeholder;
@@ -84,12 +84,15 @@ void decode(tick *curTicks, tick *prevTicks, byte *delayTimer, byte *soundTimer,
             break;
         case 0x1:
             registers[X] = registers[X] | registers[Y];
+            registers[VF] = 0x0;
             break;
         case 0x2:
             registers[X] = registers[X] & registers[Y];
+            registers[VF] = 0x0;
             break;
         case 0x3:
             registers[X] = registers[X] ^ registers[Y];
+            registers[VF] = 0x0;
             break;
         case 0x4:
             registers[X] += registers[Y];
@@ -110,8 +113,8 @@ void decode(tick *curTicks, tick *prevTicks, byte *delayTimer, byte *soundTimer,
             }
             break;
         case 0x6:
-            placeholder = registers[X] & 0x1;
-            registers[X] = registers[X] >> 1;
+            placeholder = registers[Y] & 0x1;
+            registers[X] = registers[Y] >> 1;
             registers[VF] = placeholder;
             break;
         case 0x7:
@@ -125,8 +128,8 @@ void decode(tick *curTicks, tick *prevTicks, byte *delayTimer, byte *soundTimer,
             }
             break;
         case 0xE:
-            placeholder = (registers[X] >> 7) & 0x1;
-            registers[X] = (registers[X] << 1) & 0xFF;
+            placeholder = (registers[Y] >> 7) & 0x1;
+            registers[X] = (registers[Y] << 1) & 0xFF;
             registers[VF] = placeholder;
             break;
         }
@@ -277,12 +280,14 @@ void decode(tick *curTicks, tick *prevTicks, byte *delayTimer, byte *soundTimer,
             break;
         case 0x55:
             for (int i = 0; i <= X; i++) {
-                memory[*I + i] = registers[i];
+                memory[*I] = registers[i];
+                ++*I;
             }
             break;
         case 0x65:
             for (int i = 0; i <= X; i++) {
-                registers[i] = memory[*I + i];
+                registers[i] = memory[*I];
+                ++*I;
             }
             break;
         }
